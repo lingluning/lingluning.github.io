@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png?v=5.1.4">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png?v=5.1.4">
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+  <meta name="keywords" content="Three.js,JavaScript,建筑,工程" />
+
+<meta name="description" content="用 Three.js 开发了一款面向建筑工地的移动式起重机作业计划 Web App，支持 3D 可视化布置、安全检查与作业计划书自动生成。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="开发日志 | 移动式起重机作业计划 Web App">
+<meta property="og:url" content="https://lingluning.github.io/2026/05/14/crane-work-planning-app/">
+<meta property="og:site_name" content="Luning&#39;s Blog">
+<meta property="og:description" content="用 Three.js 开发了一款面向建筑工地的移动式起重机作业计划 Web App，支持 3D 可视化布置、安全检查与作业计划书自动生成。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-05-14T00:00:00.000Z">
+<meta property="article:author" content="Luning">
+<meta property="article:tag" content="Three.js">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="工程">
+<meta name="twitter:card" content="summary">
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: { userId: '0', author: 'Author' },
+    algolia: {
+      applicationID: '', apiKey: '', indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+  <link rel="canonical" href="https://lingluning.github.io/2026/05/14/crane-work-planning-app/"/>
+
+  <title>开发日志 | 移动式起重机作业计划 Web App | Luning's Blog</title>
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Luning's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      <p class="site-subtitle">Welcome to luning's blog</p>
+  </div>
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+    <li class="menu-item menu-item-home">
+      <a href="/" rel="section">
+        <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home
+      </a>
+    </li>
+    <li class="menu-item menu-item-about">
+      <a href="/about/" rel="section">
+        <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About
+      </a>
+    </li>
+    <li class="menu-item menu-item-tags">
+      <a href="/tags/" rel="section">
+        <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags
+      </a>
+    </li>
+    <li class="menu-item menu-item-archives">
+      <a href="/archives/" rel="section">
+        <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives
+      </a>
+    </li>
+  </ul>
+</nav>
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+
+  <div id="posts" class="posts-expand">
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://lingluning.github.io/2026/05/14/crane-work-planning-app/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Luning">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://octodex.github.com/images/constructocat2.jpg">
+    </span>
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Luning's Blog">
+    </span>
+
+    <header class="post-header">
+      <h1 class="post-title" itemprop="name headline">开发日志 | 移动式起重机作业计划 Web App</h1>
+      <div class="post-meta">
+        <span class="post-time">
+          <span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i></span>
+          <span class="post-meta-item-text">Posted on</span>
+          <time title="Post created" itemprop="dateCreated datePublished" datetime="2026-05-14T00:00:00+09:00">
+            2026-05-14
+          </time>
+        </span>
+        <span class="post-meta-divider">|</span>
+        <span class="post-category">
+          <span class="post-meta-item-icon"><i class="fa fa-folder-o"></i></span>
+          <span class="post-meta-item-text">In</span>
+          <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+            <a href="/categories/Dev/" itemprop="url" rel="index">
+              <span itemprop="name">Dev</span>
+            </a>
+          </span>
+        </span>
+      </div>
+    </header>
+
+    <div class="post-body" itemprop="articleBody">
+
+      <h3 id="project-background">项目背景</h3>
+      <p>
+        在日本建筑工地，移动式起重机（移動式クレーン）作业前必须制作详细的<strong>作业计划书</strong>，标明起重机的配置位置、吊荷位置、禁止区域和通行路线，并由管理人员签认。
+        传统做法是手绘或用 AutoCAD 制图，流程繁琐、效率低。
+      </p>
+      <p>
+        为解决这个问题，我开发了这款纯前端的 <strong>移动式起重机作业计划 Web App</strong>，
+        让工地管理人员可以在浏览器中快速完成 3D 可视化布置和计划书生成，无需安装任何软件。
+      </p>
+      <p>
+        👉 <a href="https://github.com/lingluning/crane-app" target="_blank" rel="noopener">GitHub 仓库：lingluning/crane-app</a>
+      </p>
+
+      <hr>
+
+      <h3 id="features">功能介绍</h3>
+
+      <h4>🏗️ 3D 可视化布置</h4>
+      <p>
+        基于 <strong>Three.js</strong> 构建 3D 场景，用户可以在俯视地面上通过工具面板自由放置各类元素：
+      </p>
+      <ul>
+        <li><strong>🏗️ 起重机（クレーン）</strong>：使用 TADANO GR-250N 25t 起重机模型，可调整作业半径（5～15m）和旋转角度（0～360°）</li>
+        <li><strong>📦 吊荷（吊荷）</strong>：标记需要吊装的货物位置</li>
+        <li><strong>🟨 铺铁板（敷鉄板）</strong>：为起重机提供稳定支撑面，支持 1.5×3、2×4、1×2 三种规格，自动网格对齐</li>
+        <li><strong>🚫 禁止区域（立入禁止区）</strong>：多边形绘制，标记人员不得进入的危险区域</li>
+        <li><strong>🟢 通行路线（通路）</strong>：多段线绘制，标记人员和车辆通行路径</li>
+        <li><strong>📏 距离测量（測定）</strong>：点击两点即可测量实际距离</li>
+      </ul>
+
+      <h4>🛡️ 安全检查</h4>
+      <p>右侧安全面板实时显示三项安全状态：</p>
+      <ul>
+        <li><strong>作业半径</strong>：起重机作业范围是否合规</li>
+        <li><strong>吊荷位置</strong>：吊荷是否在起重机作业半径内</li>
+        <li><strong>通路重叠</strong>：通行路线是否与禁止区域发生冲突</li>
+      </ul>
+
+      <h4>📋 作业计划书自动生成</h4>
+      <p>
+        点击「計画書作成」按钮，弹出表单，填写现场信息、起重机型号、人员分工、作业内容和安全条件后，
+        一键生成 <strong>PDF 格式的移动式起重机作业计划书</strong>，满足日本建筑工地的合规要求。
+      </p>
+
+      <h4>💾 数据保存与导入导出</h4>
+      <ul>
+        <li>自动保存（Auto Save）到浏览器本地存储</li>
+        <li>手动保存 / 读取项目状态</li>
+        <li>JSON 格式导出与导入，方便团队共享</li>
+        <li>「3視図出力」：一键截取俯视图、正视图、侧视图三视图</li>
+      </ul>
+
+      <hr>
+
+      <h3 id="tech-stack">技术栈</h3>
+      <ul>
+        <li><strong>Three.js</strong>（v0.160）：3D 场景渲染、几何体创建、射线检测（Raycaster）、CSS2D 标签</li>
+        <li><strong>Tailwind CSS</strong>：UI 样式，纯 CDN 加载，无需构建工具</li>
+        <li><strong>Vanilla JavaScript (ES Modules)</strong>：模块化架构，分为 scene、state、tools、safety-tools、persistence、export 等模块</li>
+        <li><strong>浏览器原生 API</strong>：LocalStorage 持久化、File API 文件导入、Canvas 截图</li>
+        <li><strong>Import Maps</strong>：在浏览器中直接使用 ES Module 版本的 Three.js，无需打包器</li>
+      </ul>
+
+      <hr>
+
+      <h3 id="highlights">实现亮点</h3>
+
+      <h4>模块化架构</h4>
+      <p>
+        项目将功能拆分为独立模块（<code>scene.js</code>、<code>state.js</code>、<code>tools.js</code>、
+        <code>safety-tools.js</code>、<code>persistence.js</code>、<code>export.js</code>），
+        通过 ES Module 互相引用，代码结构清晰，便于维护。
+      </p>
+
+      <h4>多边形禁止区域绘制</h4>
+      <p>
+        使用 Three.js 的 <code>THREE.Shape</code> 实现任意多边形禁止区域绘制，
+        绘制过程中以虚线实时预览，Enter 确认、ESC 取消，体验流畅。
+      </p>
+
+      <h4>网格吸附（Grid Snap）</h4>
+      <p>
+        铺铁板放置时自动吸附到网格，确保铁板整齐排列，更贴近实际工地施工规范。
+      </p>
+
+      <h4>无构建工具部署</h4>
+      <p>
+        整个应用仅是一个 <code>index.html</code> + 若干 <code>.js</code> 文件，
+        利用浏览器原生 Import Maps 加载 Three.js CDN，无需 Webpack / Vite，
+        直接 GitHub Pages 托管即可使用。
+      </p>
+
+      <hr>
+
+      <h3 id="summary">总结</h3>
+      <p>
+        这个项目把土木工程的实际需求与前端 3D 技术结合起来，是我第一次用 Three.js 做完整的工程应用。
+        整个开发过程让我对 3D 坐标系、射线检测、几何体构建有了更深的理解，
+        也体会到「无构建工具的纯前端架构」的简洁之美。
+      </p>
+      <p>
+        后续计划增加：多种起重机型号支持、地面承载力计算、云端协作保存等功能。
+      </p>
+
+      <p><strong>— END —</strong></p>
+
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+        <a href="/tags/Three-js/" rel="tag"># Three.js</a>
+        <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+        <a href="/tags/工程/" rel="tag"># 工程</a>
+      </div>
+      <div class="post-nav">
+        <div class="post-nav-next post-nav-item"></div>
+        <span class="post-nav-divider"></span>
+        <div class="post-nav-prev post-nav-item">
+          <a href="/2020/03/11/Think-Python-C1/" rel="prev" title="Think Python Chapter 1 Part 1">
+            Think Python Chapter 1 Part 1 <i class="fa fa-chevron-right"></i>
+          </a>
+        </div>
+      </div>
+    </footer>
+  </div>
+  </article>
+  </div>
+
+          </div>
+        </div>
+
+        <div class="sidebar-toggle">
+          <div class="sidebar-toggle-line-wrap">
+            <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+            <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+            <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+          </div>
+        </div>
+
+        <aside id="sidebar" class="sidebar">
+          <div class="sidebar-inner">
+            <ul class="sidebar-nav motion-element">
+              <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">Table of Contents</li>
+              <li class="sidebar-nav-overview" data-target="site-overview-wrap">Overview</li>
+            </ul>
+
+            <section class="site-overview-wrap sidebar-panel">
+              <div class="site-overview">
+                <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+                  <img class="site-author-image" itemprop="image"
+                    src="https://octodex.github.com/images/constructocat2.jpg" alt="Luning" />
+                  <p class="site-author-name" itemprop="name">Luning</p>
+                  <p class="site-description motion-element" itemprop="description">Welcome to lunings blog</p>
+                </div>
+                <nav class="site-state motion-element">
+                  <div class="site-state-item site-state-posts">
+                    <a href="/archives/">
+                      <span class="site-state-item-count">4</span>
+                      <span class="site-state-item-name">posts</span>
+                    </a>
+                  </div>
+                  <div class="site-state-item site-state-tags">
+                    <a href="/tags/">
+                      <span class="site-state-item-count">4</span>
+                      <span class="site-state-item-name">tags</span>
+                    </a>
+                  </div>
+                </nav>
+                <div class="links-of-author motion-element">
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/lingluning" target="_blank" title="GitHub">
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                  <span class="links-of-author-item">
+                    <a href="mailto:lingluning@gmail.com" target="_blank" title="E-Mail">
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+              <div class="post-toc">
+                <div class="post-toc-content">
+                  <ol class="nav">
+                    <li class="nav-item nav-level-3"><a class="nav-link" href="#project-background"><span class="nav-number">1.</span> <span class="nav-text">项目背景</span></a></li>
+                    <li class="nav-item nav-level-3"><a class="nav-link" href="#features"><span class="nav-number">2.</span> <span class="nav-text">功能介绍</span></a></li>
+                    <li class="nav-item nav-level-3"><a class="nav-link" href="#tech-stack"><span class="nav-number">3.</span> <span class="nav-text">技术栈</span></a></li>
+                    <li class="nav-item nav-level-3"><a class="nav-link" href="#highlights"><span class="nav-number">4.</span> <span class="nav-text">实现亮点</span></a></li>
+                    <li class="nav-item nav-level-3"><a class="nav-link" href="#summary"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li>
+                  </ol>
+                </div>
+              </div>
+            </section>
+          </div>
+        </aside>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2026</span>
+          <span class="author" itemprop="copyrightHolder">Luning</span>
+        </div>
+      </div>
+    </footer>
+
+    <div class="back-to-top"><i class="fa fa-arrow-up"></i></div>
+  </div>
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+</body>
+</html>
