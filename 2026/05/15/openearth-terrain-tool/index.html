@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  <meta name="theme-color" content="#222">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+  <link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+  <link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png?v=5.1.4">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png?v=5.1.4">
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+  <meta name="keywords" content="JavaScript,GIS,Three.js,工程,地图" />
+  <meta name="description" content="纯前端地形模型生成工具：从日本国土地理院实时获取真实高程数据与航拍影像，一键生成带贴图的 DAE / STL 格式 3D 地形文件，可直接导入 SketchUp Go。">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="开发日志 | openEarth2D —— 地形模型生成工具">
+  <meta property="og:url" content="https://lingluning.github.io/2026/05/15/openearth-terrain-tool/">
+  <meta property="og:site_name" content="Luning&#39;s Blog">
+  <meta property="og:description" content="纯前端地形模型生成工具：从日本国土地理院实时获取真实高程数据与航拍影像，一键生成带贴图的 DAE / STL 格式 3D 地形文件，可直接导入 SketchUp Go。">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="article:published_time" content="2026-05-15T00:00:00.000Z">
+  <meta property="article:author" content="Luning">
+  <meta property="article:tag" content="JavaScript">
+  <meta property="article:tag" content="GIS">
+  <meta property="article:tag" content="工程">
+  <meta name="twitter:card" content="summary">
+
+  <script type="text/javascript" id="hexo.configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {
+      root: '/',
+      scheme: 'Pisces',
+      version: '5.1.4',
+      sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+      fancybox: true,
+      tabs: true,
+      motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+      duoshuo: { userId: '0', author: 'Author' },
+      algolia: { applicationID: '', apiKey: '', indexName: '', hits: {"per_page":10}, labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"} }
+    };
+  </script>
+
+  <link rel="canonical" href="https://lingluning.github.io/2026/05/15/openearth-terrain-tool/"/>
+  <title>开发日志 | openEarth2D —— 地形模型生成工具 | Luning's Blog</title>
+  <meta name="generator" content="Hexo 4.2.0">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner">
+        <div class="site-brand-wrapper">
+          <div class="site-meta">
+            <div class="custom-logo-site-title">
+              <a href="/" class="brand" rel="start">
+                <span class="logo-line-before"><i></i></span>
+                <span class="site-title">Luning's Blog</span>
+                <span class="logo-line-after"><i></i></span>
+              </a>
+            </div>
+            <p class="site-subtitle">Welcome to luning's blog</p>
+          </div>
+          <div class="site-nav-toggle">
+            <button>
+              <span class="btn-bar"></span>
+              <span class="btn-bar"></span>
+              <span class="btn-bar"></span>
+            </button>
+          </div>
+        </div>
+        <nav class="site-nav">
+          <ul id="menu" class="menu">
+            <li class="menu-item menu-item-home">
+              <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+            </li>
+            <li class="menu-item menu-item-about">
+              <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+            </li>
+            <li class="menu-item menu-item-tags">
+              <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br />Tags</a>
+            </li>
+            <li class="menu-item menu-item-archives">
+              <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            <div id="posts" class="posts-expand">
+              <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+                <div class="post-block">
+                  <link itemprop="mainEntityOfPage" href="https://lingluning.github.io/2026/05/15/openearth-terrain-tool/">
+                  <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+                    <meta itemprop="name" content="Luning">
+                    <meta itemprop="description" content="">
+                    <meta itemprop="image" content="https://octodex.github.com/images/constructocat2.jpg">
+                  </span>
+                  <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+                    <meta itemprop="name" content="Luning's Blog">
+                  </span>
+
+                  <header class="post-header">
+                    <h1 class="post-title" itemprop="name headline">开发日志 | openEarth2D —— 地形模型生成工具</h1>
+                    <div class="post-meta">
+                      <span class="post-time">
+                        <span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i></span>
+                        <span class="post-meta-item-text">Posted on</span>
+                        <time title="Post created" itemprop="dateCreated datePublished" datetime="2026-05-15T00:00:00+09:00">2026-05-15</time>
+                      </span>
+                      <span class="post-category">
+                        <span class="post-meta-divider">|</span>
+                        <span class="post-meta-item-icon"><i class="fa fa-folder-o"></i></span>
+                        <span class="post-meta-item-text">In</span>
+                        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                          <a href="/categories/Dev/" itemprop="url" rel="index"><span itemprop="name">Dev</span></a>
+                        </span>
+                      </span>
+                    </div>
+                  </header>
+
+                  <div class="post-body" itemprop="articleBody">
+
+                    <h3 id="background">项目背景</h3>
+                    <p>
+                      在土木和建筑工程中，常常需要将真实地形导入 3D 软件进行方案设计与分析。
+                      传统做法是购买商业 GIS 数据，或手动从地图软件导出，流程繁琐且成本高。
+                    </p>
+                    <p>
+                      日本<strong>国土地理院（GSI）</strong>提供了免费的高精度数值标高模型（DEM）API 和无缝航拍影像服务。
+                      于是我开发了 <strong>openEarth2D</strong>——一个纯前端的地形模型生成工具，
+                      只需在地图上点选位置，即可自动获取真实地形数据并生成带航拍贴图的 3D 文件，直接导入 SketchUp Go 使用。
+                    </p>
+
+                    <hr>
+
+                    <h3 id="features">功能介绍</h3>
+
+                    <h4>🗺️ 交互式地图选点</h4>
+                    <p>
+                      基于 <strong>Leaflet.js</strong> 集成国土地理院地图（标准地图 + 航拍影像双图层切换），
+                      支持三种选点方式：
+                    </p>
+                    <ul>
+                      <li>直接点击地图</li>
+                      <li>拖动红色标记点</li>
+                      <li>手动输入经纬度坐标</li>
+                    </ul>
+                    <p>选点后自动显示红色虚线框标注生成范围，并实时更新实际尺寸和高程采样点数。</p>
+
+                    <h4>⛰️ 高程数据自动获取</h4>
+                    <p>
+                      通过国土地理院的 <code>getelevation.php</code> API，
+                      对网格内每个采样点逐一请求真实高程值（单位：米），每批 5 个并行请求，
+                      最多支持 51×51 = 2601 个采样点，网格间距最小约 20m（1km 范围下）。
+                    </p>
+
+                    <h4>📸 航拍影像自动拼接</h4>
+                    <p>
+                      从国土地理院的 Seamless Photo 服务拉取 Zoom 16 级的 256×256 瓦片图，
+                      利用 Canvas API 拼接为完整影像后裁剪至精确的 BBox 范围，
+                      输出最大 2048×2048px 的 JPEG 贴图。
+                    </p>
+
+                    <h4>📦 多格式 3D 文件导出</h4>
+                    <p>支持三种导出模式：</p>
+                    <ul>
+                      <li>
+                        <strong>DAE（Collada）推荐</strong>：
+                        生成完整 Collada 1.4.1 格式，UV 坐标与航拍影像精确对应，
+                        导入 SketchUp Go 后航拍照片自动贴合地形，无需手动操作
+                      </li>
+                      <li>
+                        <strong>STL</strong>：
+                        生成二进制 STL 格式，包含法向量计算，适合 3D 打印或其他软件使用
+                      </li>
+                      <li>
+                        <strong>两者同时导出</strong>：DAE + STL 打包在同一 ZIP 中
+                      </li>
+                    </ul>
+                    <p>
+                      最终输出为 <code>terrain.zip</code>，包含 3D 文件、航拍贴图（<code>terrain_aerial.jpg</code>）
+                      和详细的 <code>README.txt</code>（含中心坐标、实际尺寸、网格参数、导入步骤）。
+                    </p>
+
+                    <hr>
+
+                    <h3 id="tech-stack">技术栈</h3>
+                    <ul>
+                      <li><strong>Leaflet.js</strong>（v1.9.4）：交互式地图，支持地图点击与标记拖拽</li>
+                      <li><strong>JSZip</strong>（v3.10.1）：浏览器端打包 ZIP 文件</li>
+                      <li><strong>Canvas API</strong>：瓦片图拼接与裁剪</li>
+                      <li><strong>Fetch API</strong>：并行请求高程数据（每批 5 个）</li>
+                      <li><strong>Vanilla JavaScript</strong>：纯原生 JS，无框架依赖</li>
+                      <li><strong>国土地理院 API</strong>：<code>getelevation.php</code>（高程）+ <code>seamlessphoto</code>（航拍瓦片）</li>
+                    </ul>
+
+                    <hr>
+
+                    <h3 id="highlights">实现亮点</h3>
+
+                    <h4>DAE 格式的 UV 贴图对齐</h4>
+                    <p>
+                      DAE（Collada）格式中，UV 坐标的 V 轴方向（下→上）与图像坐标系（上→下）相反。
+                      工具中通过 <code>v = (N-1-r)/(N-1)</code> 正确翻转 V 轴，
+                      确保航拍影像与地形网格精确对齐，不产生上下颠倒的问题。
+                    </p>
+
+                    <h4>无服务器纯前端架构</h4>
+                    <p>
+                      整个工具只有一个 HTML 文件，所有依赖通过 CDN 加载，
+                      高程数据与航拍图像直接从国土地理院服务器获取，
+                      不需要任何后端服务器，可以直接在本地打开或部署到 GitHub Pages。
+                    </p>
+
+                    <h4>坐标系转换</h4>
+                    <p>
+                      经纬度到实际米数的转换需要考虑纬度修正：
+                    </p>
+                    <ul>
+                      <li>纬度方向：<code>1° ≈ 110,540m</code>（固定）</li>
+                      <li>经度方向：<code>1° ≈ 111,320 × cos(纬度)</code>（随纬度变化）</li>
+                    </ul>
+                    <p>最终 3D 模型的 X/Y 坐标单位为米，Z 为高程（米），与 SketchUp 的坐标系（Z_UP）一致。</p>
+
+                    <h4>实时进度反馈</h4>
+                    <p>
+                      高程请求（55%进度）→ 航拍获取（25%）→ 文件生成（17%）三阶段进度条，
+                      配合终端风格的日志输出，完整记录每一步的执行结果（绿色 OK / 红色 Error / 蓝色 Info）。
+                    </p>
+
+                    <hr>
+
+                    <h3 id="usage">使用方式</h3>
+                    <ol>
+                      <li>在地图上点选目标位置（或输入经纬度）</li>
+                      <li>设置范围（推荐 0.5～2km）和网格密度（推荐 21～31）</li>
+                      <li>选择输出格式（推荐 DAE）</li>
+                      <li>点击「生成开始」，等待数据获取完成</li>
+                      <li>下载 <code>terrain.zip</code>，解压后将 <code>terrain.dae</code> 和 <code>terrain_aerial.jpg</code> 放在同一文件夹</li>
+                      <li>SketchUp Go → <code>File → Import</code> → 选择 <code>COLLADA (*.dae)</code> → 导入 <code>terrain.dae</code></li>
+                    </ol>
+
+                    <hr>
+
+                    <h3 id="summary">总结</h3>
+                    <p>
+                      openEarth2D 是一个将 GIS 公开数据与 3D 工程软件打通的实用小工具。
+                      整个项目只有一个 HTML 文件，却实现了地图交互、批量 API 请求、Canvas 图像处理、
+                      3D 几何体生成、多格式文件打包等功能，充分体验到了浏览器原生能力的强大。
+                    </p>
+                    <p>
+                      后续计划支持更多地区的高程数据源（如 SRTM、Mapbox Terrain），
+                      以及更精细的网格插值算法（双三次插值）来提升模型质量。
+                    </p>
+
+                    <p><strong>— END —</strong></p>
+
+                  </div>
+
+                  <footer class="post-footer">
+                    <div class="post-tags">
+                      <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+                      <a href="/tags/GIS/" rel="tag"># GIS</a>
+                      <a href="/tags/工程/" rel="tag"># 工程</a>
+                    </div>
+                    <div class="post-nav">
+                      <div class="post-nav-next post-nav-item">
+                        <a href="/2026/05/14/crane-work-planning-app/" rel="next" title="开发日志 | 移动式起重机作业计划 Web App">
+                          <i class="fa fa-chevron-left"></i> 开发日志 | 移动式起重机作业计划 Web App
+                        </a>
+                      </div>
+                      <span class="post-nav-divider"></span>
+                      <div class="post-nav-prev post-nav-item"></div>
+                    </div>
+                  </footer>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-toggle">
+          <div class="sidebar-toggle-line-wrap">
+            <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+            <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+            <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+          </div>
+        </div>
+
+        <aside id="sidebar" class="sidebar">
+          <div class="sidebar-inner">
+            <ul class="sidebar-nav motion-element">
+              <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">Table of Contents</li>
+              <li class="sidebar-nav-overview" data-target="site-overview-wrap">Overview</li>
+            </ul>
+
+            <section class="site-overview-wrap sidebar-panel">
+              <div class="site-overview">
+                <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+                  <img class="site-author-image" itemprop="image"
+                    src="https://octodex.github.com/images/constructocat2.jpg" alt="Luning" />
+                  <p class="site-author-name" itemprop="name">Luning</p>
+                  <p class="site-description motion-element" itemprop="description">Welcome to lunings blog</p>
+                </div>
+                <nav class="site-state motion-element">
+                  <div class="site-state-item site-state-posts">
+                    <a href="/archives/">
+                      <span class="site-state-item-count">5</span>
+                      <span class="site-state-item-name">posts</span>
+                    </a>
+                  </div>
+                  <div class="site-state-item site-state-tags">
+                    <a href="/tags/">
+                      <span class="site-state-item-count">5</span>
+                      <span class="site-state-item-name">tags</span>
+                    </a>
+                  </div>
+                </nav>
+                <div class="links-of-author motion-element">
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/lingluning" target="_blank" title="GitHub">
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                  <span class="links-of-author-item">
+                    <a href="mailto:lingluning@gmail.com" target="_blank" title="E-Mail">
+                      <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+              <div class="post-toc">
+                <div class="post-toc-content">
+                  <ol class="nav">
+                    <li class="nav-item nav-level-3"><a class="nav-link" href="#background"><span class="nav-number">1.</span> <span class="nav-text">项目背景</span></a></li>
+                    <li class="nav-item nav-level-3"><a class="nav-link" href="#features"><span class="nav-number">2.</span> <span class="nav-text">功能介绍</span></a></li>
+                    <li class="nav-item nav-level-3"><a class="nav-link" href="#tech-stack"><span class="nav-number">3.</span> <span class="nav-text">技术栈</span></a></li>
+                    <li class="nav-item nav-level-3"><a class="nav-link" href="#highlights"><span class="nav-number">4.</span> <span class="nav-text">实现亮点</span></a></li>
+                    <li class="nav-item nav-level-3"><a class="nav-link" href="#usage"><span class="nav-number">5.</span> <span class="nav-text">使用方式</span></a></li>
+                    <li class="nav-item nav-level-3"><a class="nav-link" href="#summary"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li>
+                  </ol>
+                </div>
+              </div>
+            </section>
+          </div>
+        </aside>
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2026</span>
+          <span class="author" itemprop="copyrightHolder">Luning</span>
+        </div>
+      </div>
+    </footer>
+
+    <div class="back-to-top"><i class="fa fa-arrow-up"></i></div>
+  </div>
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+</body>
+</html>
